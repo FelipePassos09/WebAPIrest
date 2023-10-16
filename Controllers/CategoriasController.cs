@@ -19,26 +19,45 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProduto()
         {
-            return _context.Categorias.Include(prod => prod.Produtos).ToList();
+            try
+            {
+                throw new DataMisalignedException();
+                return _context.Categorias.AsNoTracking().Include(prod => prod.Produtos).ToList();
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um erro ao executar sua solicitação.");
+            }
+
+            
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context.Categorias.ToList();
-
-            if(categorias is null)
+            var categorias = _context.Categorias.AsNoTracking().ToList();
+            try 
             {
-                return NotFound("Não há categorias cadastradas.");
-            }
+                if (categorias is null)
+                {
+                    return NotFound("Não há categorias cadastradas.");
+                }
 
-            return categorias;
+                return categorias;
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um erro ao executar sua solicitação.");
+            }
+            
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(cat => cat.CategoriaId == id);
+            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(cat => cat.CategoriaId == id);
             if(categoria is null)
             {
                 return NotFound("Categoria não localizada.");
