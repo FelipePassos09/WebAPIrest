@@ -29,6 +29,18 @@ namespace APICatalogo.Controllers
             return produtos;
         }
 
+        [HttpGet("primeiro")]
+        public ActionResult<Produto> GetPrimeiro()
+        {
+            var produtos = _context.Produtos.FirstOrDefault();
+            if (produtos is null)
+            {
+                return NotFound("Não há produtos cadastrados.");
+            }
+
+            return produtos;
+        }
+
         [HttpGet("{id:int}", Name = "ObterProduto")]
         public ActionResult<Produto> Get(int id) 
         {
